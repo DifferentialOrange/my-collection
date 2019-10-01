@@ -2,6 +2,11 @@ rockspec_format = '3.0'
 package = 'my-collection'
 version = 'scm-1'
 
+source  = {
+    url    = 'git+ssh://git@github.com:DifferentialOrange/my-collection.git';
+    branch = 'master';
+}
+
 -- Put any modules your app depends on here
 dependencies = {
     'tarantool',
