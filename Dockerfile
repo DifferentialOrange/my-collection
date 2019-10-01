@@ -1,7 +1,8 @@
 FROM tarantool/tarantool:1
 MAINTAINER doc@tarantool.org
 
-COPY http_server.lua /opt/tarantool/
-WORKDIR /opt/tarantool
+COPY ./init.lua /opt/collection/
+COPY ./collection /opt/collection/
+WORKDIR opt/collection/
 
-CMD ["tarantool", "http_server.lua"]
+CMD ["tarantool", "init.lua"]

@@ -1,18 +1,17 @@
 rockspec_format = '3.0'
-package = '1'
+package = 'my-collection'
 version = 'scm-1'
-source  = {
-    url = '/dev/null',
-}
+
 -- Put any modules your app depends on here
 dependencies = {
     'tarantool',
     'lua >= 5.1',
-    'luatest == 0.2.0-1',
+    'http == 1.0.6-1',
+    'checks == 3.0.1-1',
 }
 build = {
     type = 'none'
 }
 test = {
-    type = 'luatest'
+    type = 'tap'
 }
