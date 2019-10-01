@@ -26,33 +26,44 @@ local test_examples = {
 
 local tap = require("tap")
 local test = tap.test("Local HTTP server test")
-test:plan(#test_examples * 2 + 2)
+test:plan(#test_examples * 5 + 2)
 
 for _, record in ipairs(test_examples) do
-    test:is(http_client.post(send_route, json.encode(record)).status,
-        200, "Correct post request")
+    local response = http_client.post(send_route, json.encode(record))
+    test:is(response.status, 200, "Correct post request")
+    test:like(response.body, "Succesfully added a record", "Succesfully added a record")
 end
 
-local responce = http_client.get(send_route)
-test:is(responce.status, 200, "Get all records")
+local get_response = http_client.get(send_route)
+test:is(get_response.status, 200, "Get all records")
 
 local sequence_ids = {}
-local responce_records = responce.body
+local response_records = json.decode(get_response.body)
 local processed_records = {}
 
-for _, responce_record in ipairs(responce_records) do
-    if responce_record.comment == 'test example' then
-        table.insert(sequence_ids, responce_record.sequence_id)
-        local processed_record = responce_record
+for _, response_record in ipairs(response_records) do
+    if response_record.comment == 'test example' then
+        table.insert(sequence_ids, response_record.sequence_id)
+        local processed_record = response_record
         processed_record.sequence_id = nil
         table.insert(processed_records, processed_record)
     end
 end
 
-test:is_deeply(test_examples, processed_records, "Get by correct key body check")
+test:is(#test_examples, #processed_records, "Get by key quantity check")
+
+for _, test_record in ipairs(test_examples) do
+    for _, processed_record in ipairs(processed_records) do
+        if test_record.name == processed_record.name then
+            test:is_deeply(test_record, processed_record, "Correct record body")
+        end
+    end
+end
 
 for _, sequence_id in ipairs(sequence_ids) do
-    test:is(http_client.del(send_route..'/'..sequence_id).status, 200)
+    local response = http_client.delete(send_route..'/'..sequence_id)
+    test:is(response.status, 200, "Correct delete request")
+    test:like(response.body, "Succesfully deleted", "Succesfully deleted")
 end
 
 test:check()

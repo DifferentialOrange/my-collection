@@ -14,7 +14,10 @@ local function add_to_db(request)
         }
     end
 
-    local frommap_status, result = pcall(box.space.collection.frommap, box.space.collection, body)
+    -- Add sequence index
+    local rendered_body = body
+    rendered_body.sequence_id = box.sequence.collection:next()
+    local frommap_status, result, frommap_err = pcall(box.space.collection.frommap, box.space.collection, rendered_body)
 
     if frommap_status == false then
         log.verbose('Error on frommap: %s', tostring(result))
@@ -22,14 +25,20 @@ local function add_to_db(request)
             status = 400,
             body = result
         }
-    end
-
-    local insert_status, err = pcall(box.space.base.insert, box.space.base, result)
-    if insert_status == false then
-        log.verbose('Error on insert: %s', tostring(err))
+    elseif frommap_err ~= nil then
+        log.verbose('Error on frommap: %s', tostring(frommap_err))
         return {
             status = 400,
-            body = err
+            body = frommap_err
+        }
+    end
+
+    local insert_status, insert_err = pcall(box.space.collection.insert, box.space.collection, result)
+    if insert_status == false then
+        log.verbose('Error on insert: %s', tostring(insert_err))
+        return {
+            status = 400,
+            body = insert_err
         }
     else
         log.verbose('Succesfully added a record with body %s', json.encode(body))
@@ -46,7 +55,7 @@ local function get_all_records(_)
 
     return {
         status = 200,
-        body = process_records.to_tables(result)
+        body = json.encode(process_records.to_tables(result))
     }
 end
 
