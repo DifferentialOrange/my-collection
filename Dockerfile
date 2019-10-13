@@ -4,7 +4,7 @@ COPY ./collection /opt/collection/collection
 COPY ./init.lua /opt/collection/init.lua
 WORKDIR /opt/collection/
 
-RUN yum -y install unzip make git gcc gcc-c++
+RUN yum -y install unzip make git gcc gcc-c++ openssl openssl-devel
 RUN tarantoolctl rocks install http 1.0.6
 RUN tarantoolctl rocks install checks 3.0.1
 
