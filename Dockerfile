@@ -1,8 +1,11 @@
-FROM tarantool/tarantool:1
-MAINTAINER doc@tarantool.org
+FROM tarantool/tarantool:1.x-centos7
 
-COPY ./init.lua /opt/collection/
-COPY ./collection /opt/collection/
-WORKDIR opt/collection/
+COPY ./collection /opt/collection/collection
+COPY ./init.lua /opt/collection/init.lua
+WORKDIR /opt/collection/
 
-CMD ["tarantool", "init.lua"]
+RUN yum -y install unzip make git gcc gcc-c++
+RUN tarantoolctl rocks install http 1.0.6
+RUN tarantoolctl rocks install checks 3.0.1
+
+CMD ["tarantool", "./init.lua"]

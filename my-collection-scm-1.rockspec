@@ -1,4 +1,3 @@
-rockspec_format = '3.0'
 package = 'my-collection'
 version = 'scm-1'
 
@@ -16,7 +15,4 @@ dependencies = {
 }
 build = {
     type = 'none'
-}
-test = {
-    type = 'tap'
 }
